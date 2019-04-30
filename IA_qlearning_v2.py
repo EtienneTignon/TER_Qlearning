@@ -84,8 +84,8 @@ class QLearning:
         Le deuxième argument est la liste des actions que peux prendre l'IA.\n
         Le troixième est un taux d'exploration. Plus il est fort, plus l'IA explorera en prenant une decision aléatoire. (Si l'argument vaut 1.0, la decision sera toujours aléatoire). 
         Plus il est faible, plus l'IA priviligiera la meilleur action connu. (Si l'argument vaut 0.0, l'IA prendra à coup sur la meilleur décision selon elle)."""
-        etatnp = np.matrix(etat)
-        etat = etat.reshape(etatnp.size)
+        etat = np.array(etat)
+        etat = etat.reshape(etat.size)
         etat = tuple(etat)
         if etat not in list(self.transitionMatrice.keys()):
             self._ajouterColone(etat,0.5)
@@ -95,30 +95,39 @@ class QLearning:
             actionChoisi = random.choice(actionPossible)
         if(self.ancienneAction != ()):
             pastEtat, pastAction = self.ancienneAction
-            self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],0.5,etat)  
+            if pastAction in self.transitionMatrice[pastEtat]:
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],0.5,etat)
+            else:
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(0.5,0.5,etat)
         self.ancienneAction = (etat, actionChoisi)   
         return actionChoisi
     
     def gagne(self, etat):
         """Cette méthode est à appeler quand l'IA gagne. Celà lui permet de le savoir et de mettre à jours sa matrice en conséquence.\n
         Elle prend comme argument l'état final du jeu."""
-        etatnp = np.matrix(etat)
-        etat = etat.reshape(etatnp.size)
+        etat = np.array(etat)
+        etat = etat.reshape(etat.size)
         etat = tuple(etat)
         if etat not in list(self.transitionMatrice.keys()):
             self._ajouterColone(etat,1.0)
         if(not self.ancienneAction == ()):
             pastEtat, pastAction = self.ancienneAction
-            self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],1.0,etat)
+            if pastAction in self.transitionMatrice[pastEtat]:
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],1.0,etat)
+            else:
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(1.0,1.0,etat)
         
     def perdu(self, etat):
         """Cette méthode est à appeler quand l'IA perd. Celà lui permet de le savoir et de mettre à jours sa matrice en conséquence.\n
         Elle prend comme argument l'état final du jeu."""
-        etatnp = np.matrix(etat)
-        etat = etat.reshape(etatnp.size)
+        etat = np.array(etat)
+        etat = etat.reshape(etat.size)
         etat = tuple(etat)
         if etat not in list(self.transitionMatrice.keys()):
             self._ajouterColone(etat,0.0)
         if(not self.ancienneAction == ()):
             pastEtat, pastAction = self.ancienneAction
-            self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],0.0,etat)  
+            if pastAction in self.transitionMatrice[pastEtat]:
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],0.0,etat)
+            else:
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(0.0,0.0,etat)  

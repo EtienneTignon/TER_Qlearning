@@ -23,7 +23,7 @@ while i < 100000.0:
         game.doMove(Jr.smartRandom(game.getMove()))
         if (game.estFini):
             break
-        game.doMove(Jq.prendreUneDecision(game.getStatus(),game.getMove()))
+        game.doMove(Jq.prendreUneDecision(game.getStatus(),game.getMove(),0.5))
     if game.winner == 1:
         print("RandGagne")
         Jq.perdu(game.getStatus())
@@ -48,7 +48,7 @@ while i < 10000000.0:
         game.doMove(Jr.smartRandom(game.getMove()))
         if (game.estFini):
             break
-        game.doMove(Jq._decisionRationel(game.getStatus(),game.getMove()))
+        game.doMove(Jq.prendreUneDecision(game.getStatus(),game.getMove(),0.0))
     if game.winner == 1:
         print("RandGagne")
         Jq.perdu(game.getStatus())
@@ -75,7 +75,7 @@ while i < 100.0:
         print(game.game)
         if (game.estFini):
             break
-        game.doMove(Jq._decisionRationel(game.getStatus(),game.getMove()))
+        game.doMove(Jq.prendreUneDecision(game.getStatus(),game.getMove(),0.0))
         print(game.game)
     if game.winner == 1:
         print("RandGagne")

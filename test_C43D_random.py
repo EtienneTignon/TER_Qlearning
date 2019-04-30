@@ -13,15 +13,11 @@ game = c43d.Connect43D()
 player = 0
 i = 1
 
-while(game._check_win):
-    print("||",i,"||")
+while(not game.is_finished()):
     i += 1
-    player += 1
-    if(player==3):
-        player = 1
     coup_possible = game.get_move()
     print(coup_possible)
     coup_choisi = random.choice(coup_possible)
     print(coup_choisi)
-    game.do_move(coup_choisi,player)
+    game.do_move(coup_choisi)
     print(game.game)
