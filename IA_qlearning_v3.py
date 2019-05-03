@@ -41,12 +41,12 @@ class QLearning:
     def _choisirActionColone(self, actionPossible, etat):
         maxValeur = -10000000.0
         listActionChoisi = []
-        listActionNonRencontré = []
+        listActionNonRencontre = []
         for indice, action in enumerate(actionPossible):
             if action not in self.transitionMatrice[etat].keys():
-                listActionNonRencontré.append(action)
-        if listActionNonRencontré != []:
-            actionChoisi = random.choice(listActionNonRencontré)
+                listActionNonRencontre.append(action)
+        if listActionNonRencontre != []:
+            actionChoisi = random.choice(listActionNonRencontre)
             self.transitionMatrice[etat][actionChoisi] = 0.5
             return actionChoisi
         for action, valeur in self.transitionMatrice[etat].items():
