@@ -23,12 +23,12 @@ def partieEntreQ(joueur1, joueur2):
                 break
             game.do_move(joueur2.prendreUneDecision(game.game,game.get_move(),0.5))
         if(game.winner == 1):
-            joueur1.gagne(game.game)
-            joueur2.perdu(game.game)
+            joueur1.gagne()
+            joueur2.perdu()
             gagne += 1.0
         else:
-            joueur1.perdu(game.game)
-            joueur2.gagne(game.game)
+            joueur1.perdu()
+            joueur2.gagne()
         i += 1
     ratioj1 = gagne/100.0
     ratioj2 = 1.0-ratioj1
@@ -46,22 +46,22 @@ def partieContreRand(joueur, premier):
         while True:
             if (game.is_finished()):
                 break
-            game.do_move(joueur.prendreUneDecision(game.game,game.get_move(),0.5))
+            game.do_move(joueur.prendreUneDecision(game.game,game.get_move(),0.0))
             if (game.is_finished()):
                 break
             game.do_move(joueurRand.smartRandom(game.get_move()))
         if(premier):
             if(game.winner == 1):
-                joueur.gagne(game.game)
+                joueur.gagne()
                 gagne += 1.0
             else:
-                joueur.perdu(game.game)
+                joueur.perdu()
         else:
             if(game.winner == 2):
-                joueur.gagne(game.game)
+                joueur.gagne()
                 gagne += 1.0
             else:
-                joueur.perdu(game.game)   
+                joueur.perdu()   
         i += 1
     ratio = gagne/partie
     if(not premier):
@@ -85,16 +85,16 @@ def entrainementContreRand(joueur, premier):
             game.do_move(joueurRand.smartRandom(game.get_move()))
         if(premier):
             if(game.winner == 1):
-                joueur.gagne(game.game)
+                joueur.gagne()
                 gagne += 1.0
             else:
-                joueur.perdu(game.game)
+                joueur.perdu()
         else:
             if(game.winner == 2):
-                joueur.gagne(game.game)
+                joueur.gagne()
                 gagne += 1.0
             else:
-                joueur.perdu(game.game)            
+                joueur.perdu()            
         i += 1
     ratio = gagne/100.0
     if(not premier):

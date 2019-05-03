@@ -9,7 +9,6 @@ Created on Wed Apr 24 13:49:20 2019
 
 from Connect43D import Connect43D 
 from IA_qlearning_v1 import QLearning
-from IA_random import RandomPlayer
 from IA_mcts import mcts
 
 joueurQ = QLearning()
@@ -23,20 +22,23 @@ while i < 1000:
     while True:    
         if (game.is_finished()):
             break
-        game.do_move(joueurQ.prendreUneDecision(game.game,game.get_move(),0.5))
+        game.do_move(joueurQ.prendreUneDecision(game.game,game.get_move(),(1.0/(i+1))))
         if (game.is_finished()):
             break
         game.do_move(mcts(game, 20, game.actual_player))
     if(game.winner == 1):
-        joueurQ.gagne(game.game)
+        joueurQ.gagne()
         gagne += 1.0
         print("Bravo QLearning")
         qvictoire += 1
     elif(game.winner == 2):
-        joueurQ.perdu(game.game)
+        joueurQ.perdu()
         print("Bravo MCTS")
         mvictoire += 1
-    print(str((qvictoire,mvictoire)))
+    else:
+        joueurQ.gagne()
+        print("Egalité")
+    print(str((qvictoire,mvictoire)) + "/" + str(i+1))
     i += 1
     
 i = 0
@@ -54,13 +56,16 @@ while i < 1000:
         game.do_move(mcts(game, 50, game.actual_player))
         print(game.game)
     if(game.winner == 1):
-        joueurQ.gagne(game.game)
+        joueurQ.gagne()
         gagne += 1.0
         print("Bravo QLearning")
         qvictoire += 1
-    else:
-        joueurQ.perdu(game.game)
+    elif(game.winner == 2):
+        joueurQ.perdu()
         print("Bravo MCTS")
         mvictoire += 1
-    print(str((qvictoire,mvictoire)))
+    else:
+        joueurQ.gagne()
+        print("Egalité")
+    print(str((qvictoire,mvictoire)) + "/" + str(i+1))
     i += 1

@@ -89,7 +89,7 @@ class QLearning:
         etat = tuple(etat)
         if etat not in list(self.transitionMatrice.keys()):
             self._ajouterColone(etat,0.5)
-        if (random.random()<tauxExploration):
+        if (random.random()>tauxExploration):
             actionChoisi = self._decisionRationel(etat, actionPossible)
         else:
             actionChoisi = random.choice(actionPossible)
@@ -102,32 +102,26 @@ class QLearning:
         self.ancienneAction = (etat, actionChoisi)   
         return actionChoisi
     
-    def gagne(self, etat):
+    def gagne(self):
         """Cette méthode est à appeler quand l'IA gagne. Celà lui permet de le savoir et de mettre à jours sa matrice en conséquence.\n
         Elle prend comme argument l'état final du jeu."""
-        etat = np.array(etat)
-        etat = etat.reshape(etat.size)
-        etat = tuple(etat)
-        if etat not in list(self.transitionMatrice.keys()):
-            self._ajouterColone(etat,1.0)
+        if ("Victoire") not in list(self.transitionMatrice.keys()):
+            self._ajouterColone(("Victoire"),1.0)
         if(not self.ancienneAction == ()):
             pastEtat, pastAction = self.ancienneAction
             if pastAction in self.transitionMatrice[pastEtat]:
-                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],1.0,etat)
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],1.0,("Victoire"))
             else:
-                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(1.0,1.0,etat)
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(1.0,1.0,("Victoire"))
         
-    def perdu(self, etat):
+    def perdu(self):
         """Cette méthode est à appeler quand l'IA perd. Celà lui permet de le savoir et de mettre à jours sa matrice en conséquence.\n
         Elle prend comme argument l'état final du jeu."""
-        etat = np.array(etat)
-        etat = etat.reshape(etat.size)
-        etat = tuple(etat)
-        if etat not in list(self.transitionMatrice.keys()):
-            self._ajouterColone(etat,0.0)
+        if ("Defaite") not in list(self.transitionMatrice.keys()):
+            self._ajouterColone(("Defaite"),0.0)
         if(not self.ancienneAction == ()):
             pastEtat, pastAction = self.ancienneAction
             if pastAction in self.transitionMatrice[pastEtat]:
-                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],0.0,etat)
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],0.0,("Defaite"))
             else:
-                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(0.0,0.0,etat)  
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(0.0,0.0,("Defaite"))  

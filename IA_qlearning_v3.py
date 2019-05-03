@@ -16,8 +16,8 @@ class QLearning:
     def __init__(self):
         self.transitionMatrice = {}
         self.ancienneAction = ()
-        self.alpha = 0.1
-        self.gamma = 0.5
+        self.alpha = 0.5
+        self.gamma = 0.1
         
     def afficherMatriceTransition(self):
         """Cette méthode permet d'afficher la matrice de transition dans le terminal."""
@@ -39,7 +39,7 @@ class QLearning:
         self.transitionMatrice[etat] = colone
     
     def _choisirActionColone(self, actionPossible, etat):
-        maxValeur = -1.0
+        maxValeur = -10000000.0
         listActionChoisi = []
         listActionNonRencontré = []
         for indice, action in enumerate(actionPossible):
@@ -85,7 +85,7 @@ class QLearning:
         Plus il est faible, plus l'IA priviligiera la meilleur action connu. (Si l'argument vaut 0.0, l'IA prendra à coup sur la meilleur décision selon elle)."""
         if etat not in list(self.transitionMatrice.keys()):
             self._ajouterColone(etat,0.5)
-        if (random.random()<tauxExploration):
+        if (random.random()>tauxExploration):
             actionChoisi = self._decisionRationel(etat, actionPossible)
         else:
             actionChoisi = random.choice(actionPossible)
@@ -98,25 +98,25 @@ class QLearning:
         self.ancienneAction = (etat, actionChoisi)   
         return actionChoisi
     
-    def gagne(self, etat):
+    def gagne(self):
         """Cette méthode est à appeler quand l'IA gagne. Celà lui permet de le savoir et de mettre à jours sa matrice en conséquence.\n
         Elle prend comme argument l'état final du jeu."""
-        if etat not in list(self.transitionMatrice.keys()):
-            self._ajouterColone(etat,1.0)
+        if ("Victoire") not in list(self.transitionMatrice.keys()):
+            self._ajouterColone(("Victoire"),1.0)
         if(not self.ancienneAction == ()):
             pastEtat, pastAction = self.ancienneAction
             if pastAction in self.transitionMatrice[pastEtat]:
-                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],1.0,etat)
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],10.0,("Victoire"))
             else:
-                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(1.0,1.0,etat)          
-    def perdu(self, etat):
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(10.0,10.0,("Victoire"))          
+    def perdu(self):
         """Cette méthode est à appeler quand l'IA perd. Celà lui permet de le savoir et de mettre à jours sa matrice en conséquence.\n
         Elle prend comme argument l'état final du jeu."""
-        if etat not in list(self.transitionMatrice.keys()):
-            self._ajouterColone(etat,0.0)
+        if ("Defaite") not in list(self.transitionMatrice.keys()):
+            self._ajouterColone(("Defaite"),0.0)
         if(not self.ancienneAction == ()):
             pastEtat, pastAction = self.ancienneAction
             if pastAction in self.transitionMatrice[pastEtat]:
-                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],0.0,etat)
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(self.transitionMatrice[pastEtat][pastAction],-10.0,("Defaite"))
             else:
-                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(0.0,0.0,etat)    
+                self.transitionMatrice[pastEtat][pastAction] = self._MaJ(10.0,-10.0,("Defaite"))    
