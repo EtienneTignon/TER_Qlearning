@@ -70,7 +70,7 @@ j = 1.0
 while(True):
     i = 0.0
     gagne = 0.0
-    égalité = 0.0
+    egalite = 0.0
     perdu = 0.0
     while i < 10000.0:
         game = Morpion()
@@ -90,7 +90,7 @@ while(True):
             gagne += 1.0
         else:
             Jq.gagne()
-            égalité += 1.0
+            egalite += 1.0
         i += 1.0
     j += 1.0
     print("Victoire : " + str(gagne/100.0) + " / Egalité : " + str(égalité/100.0) + " / Perdu : " + str(perdu/100.0))
