@@ -84,7 +84,6 @@ while(True):
         if game.winner == 1:
             Jq.perdu()
             perdu += 1.0
-            print(game.game)
         elif game.winner == 2:
             Jq.gagne()
             gagne += 1.0

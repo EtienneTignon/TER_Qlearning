@@ -18,16 +18,19 @@ def partieEntreQ(joueur1, joueur2):
         while True:    
             if (game.is_finished()):
                 break
-            game.do_move(joueur1.prendreUneDecision(game.game,game.get_move(),0.5))
+            game.do_move(joueur1.prendreUneDecision(game.game,game.get_move(),(1/i+1)))
             if (game.is_finished()):
                 break
-            game.do_move(joueur2.prendreUneDecision(game.game,game.get_move(),0.5))
+            game.do_move(joueur2.prendreUneDecision(game.game,game.get_move(),(1/i+1)))
         if(game.winner == 1):
             joueur1.gagne()
             joueur2.perdu()
             gagne += 1.0
-        else:
+        elif(game.winner == 2):
             joueur1.perdu()
+            joueur2.gagne()
+        else:
+            joueur1.gagne()
             joueur2.gagne()
         i += 1
     ratioj1 = gagne/100.0
@@ -57,7 +60,7 @@ def partieContreRand(joueur, premier):
             else:
                 joueur.perdu()
         else:
-            if(game.winner == 2):
+            if(game.winner != 1):
                 joueur.gagne()
                 gagne += 1.0
             else:
@@ -79,7 +82,7 @@ def entrainementContreRand(joueur, premier):
         while True:
             if (game.is_finished()):
                 break
-            game.do_move(joueur.prendreUneDecision(game.game,game.get_move(),0.5))
+            game.do_move(joueur.prendreUneDecision(game.game,game.get_move(),(1/i+1)))
             if (game.is_finished()):
                 break
             game.do_move(joueurRand.smartRandom(game.get_move()))
@@ -90,7 +93,7 @@ def entrainementContreRand(joueur, premier):
             else:
                 joueur.perdu()
         else:
-            if(game.winner == 2):
+            if(game.winner != 1):
                 joueur.gagne()
                 gagne += 1.0
             else:
@@ -248,5 +251,5 @@ i = 0
 while(i<1000):
     entrainementContreRand(joueurQ,True)
     print("J1 : " + str(partieContreRand(joueurQ,True)))
-    joueurQ.enrengistrerMatriceTransition("test.txt")
+    # joueurQ.enrengistrerMatriceTransition("test.txt")
     i += 1
