@@ -18,10 +18,10 @@ def partieEntreQ(joueur1, joueur2):
         while True:    
             if (game.is_finished()):
                 break
-            game.do_move(joueur1.prendreUneDecision(game.game,game.get_move(),(1/i+1)))
+            game.do_move(joueur1.prendreUneDecision(game.game,game.get_move(),(1.0/i+1)))
             if (game.is_finished()):
                 break
-            game.do_move(joueur2.prendreUneDecision(game.game,game.get_move(),(1/i+1)))
+            game.do_move(joueur2.prendreUneDecision(game.game,game.get_move(),(1.0/i+1)))
         if(game.winner == 1):
             joueur1.gagne()
             joueur2.perdu()
@@ -82,7 +82,7 @@ def entrainementContreRand(joueur, premier):
         while True:
             if (game.is_finished()):
                 break
-            game.do_move(joueur.prendreUneDecision(game.game,game.get_move(),(1/i+1)))
+            game.do_move(joueur.prendreUneDecision(game.game,game.get_move(),(1.0/i+1)))
             if (game.is_finished()):
                 break
             game.do_move(joueurRand.smartRandom(game.get_move()))
