@@ -93,5 +93,5 @@ while(True):
             egalite += 1.0
         i += 1.0
     j += 1.0
-    print("Victoire : " + str(gagne/100.0) + " / Egalité : " + str(égalité/100.0) + " / Perdu : " + str(perdu/100.0))
+    print("Victoire : " + str(gagne/100.0) + " / Egalité : " + str(egalite/100.0) + " / Perdu : " + str(perdu/100.0))
     Jq.enrengistrerMatriceTransition("test.txt")
