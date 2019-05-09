@@ -1,26 +1,27 @@
 import numpy as np
 
 class Connect43D:
-    def __init__(self, z=4, y=4, x=4):
+    def __init__(self, z=4, y=4, x=4, size=4):
         self.game = np.full((z, y, x), 0, dtype=np.dtype('i8'))
         self.higher_level = np.full((y, x), 0, dtype=np.dtype('i8'))
         self.winner = 0
         self.actual_player = 1
+        self.size = size
 
     def _check_win(self, line):
         """ check one line if 4 same number are in the row"""
         total = 0
-        if len(line) >= 4:
+        if len(line) >= self.size:
             for i in range(len(line)):
                 if line[i] == self.actual_player:
                     total += 1
-                    if total == 4:
+                    if total == self.size:
                         self.winner = self.actual_player
                         break
                 else:
                     total = 0
 
-        return total == 4
+        return total == self.size
 
     def _get_diagonal(self, matrix, x, y):
         """ get a diagonal from a matrix via diagonal function from numpy """
@@ -87,9 +88,15 @@ class Connect43D:
         else:
             self.actual_player = 1
 
+    def get_size(self):
+        """ returns the size ofthe board in this order : x, y, z """
+        return self.game.shape[2], self.game.shape[1], self.game.shape[0]
+
     def is_finished(self):
+        """ returns True if the game is finished """
         return self.get_move() == [] or self.winner != 0
 
     def get_move(self):
         """ returns all the possible moves in the actual state of the game """
         return [(x, y) for y in range(self.higher_level.shape[0]) for x in range(self.higher_level.shape[1]) if self.higher_level[y][x] < self.game.shape[0]]
+

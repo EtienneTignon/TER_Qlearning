@@ -8,8 +8,9 @@ Created on Wed Apr 24 13:49:20 2019
 
 
 from Connect43D import Connect43D 
-from IA_qlearning_v1 import QLearning
-from IA_mcts import mcts
+from IA_qlearning_v2 import QLearning
+from agent import Agent
+from Morpion import Morpion
 
 joueurQ = QLearning()
 qvictoire = 0
@@ -17,15 +18,21 @@ mvictoire = 0
 
 i = 0
 gagne = 0.0
-while i < 1000:
-    game = Connect43D()
+while i < 5000:
+    #game = Connect43D(3,3,3,3)
+    game = Connect43D(5,1,7,4)
+    joueurM = Agent(2, game)
     while True:    
         if (game.is_finished()):
             break
-        game.do_move(joueurQ.prendreUneDecision(game.game,game.get_move(),(1.0/(i+1))))
+        move = joueurQ.prendreUneDecision(game.game,game.get_move(),(1.0/(i+1)))
+        game.do_move(move)
+        joueurM.update_action(move)
         if (game.is_finished()):
             break
-        game.do_move(mcts(game, 20, game.actual_player))
+        move = joueurM.next_action(200)
+        game.do_move(move)
+        joueurM.update_action(move)
     if(game.winner == 1):
         joueurQ.gagne()
         gagne += 1.0
@@ -45,16 +52,20 @@ i = 0
 qvictoire = 0
 mvictoire = 0
 while i < 1000:
-    game = Connect43D()
+    #game = Connect43D(3,3,3,3)
+    game = Connect43D(5,1,7,4)
+    joueurM = Agent(2, game)
     while True:    
         if (game.is_finished()):
             break
-        game.do_move(joueurQ.prendreUneDecision(game.game,game.get_move(),0.0))
-        print(game.game)
+        move = joueurQ.prendreUneDecision(game.game,game.get_move(),0.0)
+        game.do_move(move)
+        joueurM.update_action(move)
         if (game.is_finished()):
             break
-        game.do_move(mcts(game, 50, game.actual_player))
-        print(game.game)
+        move = joueurM.next_action(200)
+        game.do_move(move)
+        joueurM.update_action(move)
     if(game.winner == 1):
         joueurQ.gagne()
         gagne += 1.0
@@ -67,5 +78,6 @@ while i < 1000:
     else:
         joueurQ.gagne()
         print("Egalité")
+    print(game.game)
     print(str((qvictoire,mvictoire)) + "/" + str(i+1))
     i += 1

@@ -12,8 +12,8 @@ class Morpion:
     def __init__(self):
         self.game = np.full((3,3), 0, dtype=np.dtype('i8'))
         self.winner = 0
-        self.actualPlayer = 1
-        self.estFini = False
+        self.actual_player = 1
+        self.isFinished = False
         self.coupRestant = 9
     
     def _checkWin(self, coup):
@@ -43,26 +43,29 @@ class Morpion:
                 return True
         return False
     
-    def doMove(self, coup):
+    def is_finished(self):
+        return self.isFinished
+    
+    def do_move(self, coup):
         x = coup[0]
         y = coup[1]
-        if self.game[x][y] == 0 and not self.estFini:
-            self.game[x][y] = self.actualPlayer
+        if self.game[x][y] == 0 and not self.isFinished:
+            self.game[x][y] = self.actual_player
             self.coupRestant -= 1
             if self._checkWin(coup):
-                self.estFini=True
-                self.winner=self.actualPlayer
+                self.isFinished=True
+                self.winner=self.actual_player
             elif self.coupRestant==0:
-                self.estFini=True
+                self.isFinished=True
             else:
-                if self.actualPlayer == 1:
-                    self.actualPlayer = 2
+                if self.actual_player == 1:
+                    self.actual_player = 2
                 else:
-                    self.actualPlayer = 1
+                    self.actual_player = 1
         else:
             print("Vous en pouvez pas jouer ce coup")
             
-    def getMove(self):
+    def get_move(self):
         listeCoupPossible = []
         x = 0
         while x<3:
@@ -77,4 +80,4 @@ class Morpion:
     def getStatus(self):
         game = self.game.reshape(9)
         game = tuple(game)
-        return (game,self.actualPlayer)
+        return (game,self.actual_player)
