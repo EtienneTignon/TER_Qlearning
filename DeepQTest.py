@@ -39,7 +39,7 @@ class Net(nn.Module):
 
 class DeepQAgent:
     
-    def __init__(self, majrate = 500, gamma=1e-1, learning_rate = 1e-1):
+    def __init__(self, majrate = 50, gamma=1e-1, learning_rate = 1e-1):
         #Creation des deux réseaux de neurones.
         self.policy_net = Net()
         self.target_net = Net()
@@ -68,8 +68,6 @@ class DeepQAgent:
         expectedValues = (self.Gamma*expectedValues)+((1-self.Gamma)*recompense)
         loss = F.smooth_l1_loss(self.AnciennesValeurs, expectedValues)
         self.optimizer.zero_grad()
-        print()
-        print(loss)
         loss.backward()
         self.optimizer.step()
     
@@ -115,25 +113,24 @@ dqa = DeepQAgent()
 old = dqa.policy_net.state_dict()
 jr = RandomPlayer()
 i = 0
-while(i<1):
+while(i<100):
     victoire = 0
     defaite = 0
     egalite = 0
-    connard = 0
+    coupIllegal = 0
     j = 0
-    while(j<100):
-        print("New Game")
+    while(j<1000):
         game = Connect43D(1,3,3,3)
         joueur = 1
         jeuEnCours = True
-        dqaEstDebile = False
+        disqualification = False
         while(jeuEnCours):
             if(joueur==1):
                 action = dqa.faireUnChoix(game.game,(1.0/(j+1)))
                 if(action not in game.get_move()):
                     jeuEnCours = False
-                    dqaEstDebile = True
-                    connard += 1
+                    disqualification = True
+                    coupIllegal += 1
                 else:
                     game.do_move(action)
             else:
@@ -141,7 +138,7 @@ while(i<1):
             if (game.is_finished()):
                 jeuEnCours = False
             #print(game.game)
-        if(dqaEstDebile or game.winner==2):
+        if(disqualification or game.winner==2):
             dqa.perdre(game.game)
             defaite += 1
         elif(game.winner==1):
@@ -152,10 +149,7 @@ while(i<1):
             egalite += 1
         j += 1
         #print("Fin du jeu")
-    print(str(victoire)+" . "+str(egalite)+" . "+str(defaite))
-    print(dqa.policy_net.state_dict())
-    print()
-    print(old)
+    print(str(victoire)+" . "+str(egalite)+" . "+str(defaite)+"(dont "+str(coupIllegal)+" coup interdit)")
     i += 1
     
     
