@@ -57,6 +57,8 @@ class DeepQAgent:
         self.AnciennesValeurs = ()
         
     def nouvellePartie(self):
+        """Fonction à appeler pour prévenir l'agent que la prochaine action à prendre sera la première d'une nouvelle partie.
+        Si cette fonction n'est pas appelé, l'agent pourra croire que la dernière action de la partie précédente l'aura mené à l'état où il se trouve en début de partie."""
         self.AncienEtat = ()
         self.AncienneValeur = ()
     
@@ -64,14 +66,16 @@ class DeepQAgent:
         newState = etat.reshape(etat.size)
         newState = [newState]
         newState = torch.tensor(newState,dtype=torch.float)
-        expectedValues = self.target_net(newState)
-        expectedValues = (self.Gamma*expectedValues)+((1-self.Gamma)*recompense)
-        loss = F.smooth_l1_loss(self.AnciennesValeurs, expectedValues)
+        TD_Values = self.target_net(newState)
+        TD_Valuess = (self.Gamma*TD_Values)+((1-self.Gamma)*recompense)
+        loss = F.smooth_l1_loss(self.AnciennesValeurs, TD_Values)
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
     
     def faireUnChoix(self,etat,tauxHasard=0.0):
+        """Fonction servant à faire prendre une decision à l'IA.
+        Ses paramètres sont l'état actuel du jeu, ainsi que le pourcentage de chance de prendre une decision aléatoire (entre 0 et 1)."""
         if(not self.AncienEtat == ()):
             self._MaJreseau(0.0,etat)
         state = etat.reshape(etat.size)
