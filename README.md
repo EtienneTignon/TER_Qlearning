@@ -11,10 +11,14 @@ Ce dépot contient une implémentation du puissance 4 en 3d et du morpion, ainsi
  - IA\_qlearning\_v1.py : Une implémentation du Q-Learning dédié au puissance 4 en 3D.
  - IA\_qlearning\_v2.py : Une implémentation du Q-Learning prenant des matrices en entrées.
  - IA\_qlearning\_v3.py : Une implémentation du Q-Learning prenant des tuples en entrées.
- - IA_random.py : Une IA complétement aléatoire.
+ - IA\_random.py : Une IA complétement aléatoire.
+ - IA\_deepqlearning.py : Une implementation du deep Q learning (!!!WIP!!!)
 
 ## Fichiers de test
  - test\_C43D\_Q.py
  - test\_C43D\_QvsMCTS.py
  - test\_C43D\_random.py
  - test\_morpion\_Q.py
+
+## Deep Learning
+ - DeepQTest.py : Contient un morpion et un agent de deep Q learning adapté pour le résoudre.
