@@ -53,33 +53,43 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.size_in = xin*yin*zin
         self.size_out = xout*yout
-        self.conv1 = nn.Conv3d(1,64,5,padding=2)
-        self.bnc1 = nn.BatchNorm3d(64)
-        self.conv2 = nn.Conv3d(64,64,3,padding=1)
-        self.bn2 = nn.BatchNorm3d(64)
+        self.conv1 = nn.Conv3d(1,100,3,padding=1)
+        self.bnc1 = nn.BatchNorm3d(100)
         """
-        self.conv3 = nn.Conv2d(1,1,3,padding=1)
-        self.bn3 = nn.BatchNorm2d(1)
+        self.conv2 = nn.Conv3d(100,100,3,padding=1)
+        self.bnc2 = nn.BatchNorm3d(100)
+        self.conv3 = nn.Conv3d(100,100,3,padding=1)
+        self.bnc3 = nn.BatchNorm3d(100)
+        self.conv4 = nn.Conv3d(100,100,3,padding=1)
+        self.bnc4 = nn.BatchNorm3d(100)
+        self.conv5 = nn.Conv3d(100,100,3,padding=1)
+        self.bnc5 = nn.BatchNorm3d(100)
+        self.conv6 = nn.Conv3d(100,100,3,padding=1)
+        self.bnc6 = nn.BatchNorm3d(100)
         """
-        self.lin1 = nn.Linear(64*self.size_in, 10*self.size_in)
-        self.bnl1 = nn.BatchNorm1d(10*self.size_in)
-        self.lin2 = nn.Linear(10*self.size_in, 10*self.size_out)
-        self.bnl2 = nn.BatchNorm1d(10*self.size_out)
-        self.lin3 = nn.Linear(10*self.size_out, self.size_out)
+        self.lin1 = nn.Linear(100*self.size_in, 100*self.size_in)
+        self.bnl1 = nn.BatchNorm1d(100*self.size_in)
+        self.lin2 = nn.Linear(100*self.size_in, 100*self.size_out)
+        self.bnl2 = nn.BatchNorm1d(100*self.size_out)
+        self.lin3 = nn.Linear(100*self.size_out, self.size_out)
         self.bnl3 = nn.BatchNorm1d(self.size_out)
 
 
     def forward(self, x, ):
         x = x.unsqueeze(0).unsqueeze(0)
         x = F.relu(self.bnc1(self.conv1(x)))
-        x = F.relu(self.bn2(self.conv2(x)))
         """
-        x = F.relu(self.bn3(self.conv3(x)))
+        x = F.relu(self.bnc2(self.conv2(x)))
+        x = F.relu(self.bnc3(self.conv3(x)))
+        x = F.relu(self.bnc4(self.conv4(x)))
+        x = F.relu(self.bnc5(self.conv5(x)))
+        x = F.relu(self.bnc6(self.conv6(x)))
         """
-        x = x.view(-1,64*9)
+        x = x.view(-1,100*9)
         x = F.relu(self.bnl1(self.lin1(x)))
         x = F.relu(self.bnl2(self.lin2(x)))
         x = self.bnl3(self.lin3(x))
+        #print(x)
         return x
 
     def num_flat_features(self, x):
@@ -91,7 +101,7 @@ class Net(nn.Module):
 
 class DeepQLearning:
     
-    def __init__(self, xin, yin, zin, xout, yout, majrate = 100, gamma=0.1, learning_rate = 0.001, device = "cpu"):
+    def __init__(self, xin, yin, zin, xout, yout, majrate = 500, gamma=0.3, learning_rate = 0.002, device = "cpu"):
         super(DeepQLearning, self).__init__()
         #Creation des deux réseaux de neurones.
         self.policy_net = Net(xin, yin, zin, xout, yout)
@@ -107,8 +117,8 @@ class DeepQLearning:
         self.MaJrate = majrate
         self.step = 0
         #Création de la mémoire
-        self.memory = ReplayMemory(20000)
-        self.batch_size = 2000
+        self.memory = ReplayMemory(10000)
+        self.batch_size = 5000
         #Initialisation des variables du Q-Learning
         self.Gamma = gamma
         self.values = False
@@ -128,6 +138,7 @@ class DeepQLearning:
         self.initial = True
         
     def _MaJreseau_Batch(self):
+        self.policy_net.train()
         #Si la mémoire n'est pas pleine, on attend son remplissage avant de mettre à jour le réseau.
         if len(self.memory) < self.batch_size:
             return
@@ -153,8 +164,8 @@ class DeepQLearning:
         for param in self.policy_net.parameters():
             param.grad.data.clamp_(-1, 1)
         self.optimizer.step()
-
-    def faireUnChoix(self,etat,liste_action_possible,tauxHasard=0.0):
+        
+    def faireUnChoix(self,etat,liste_action_possible,tauxHasard=0.0,action_legal_seulement=False):
         """Fonction servant à faire prendre une decision à l'IA.
         Ses paramètres sont l'état actuel du jeu, ainsi que le pourcentage de chance de prendre une decision aléatoire (entre 0 et 1)."""
         
@@ -179,8 +190,16 @@ class DeepQLearning:
         #Au hasard :
         # - Soit l'action est aléatoire
         # - Soit la meilleur action est choisi
+        #Si le paramètre action_legale_seuement est à true, seul une action légal sera prise.
         if (random.random()>tauxHasard):
-            self.action = self.values.argmax().item()
+            if(not action_legal_seulement):
+                self.action = self.values.argmax().item()
+            else:
+                lst_valeur = [-100.0] * (self.xout * self.yout)
+                for action_possible in liste_action_possible:
+                    act = action_possible[1]*self.xout+action_possible[0]
+                    lst_valeur[act]=self.values[0][act]
+                self.action = lst_valeur.index(max(lst_valeur))
             action = (self.action//self.xout, self.action%self.xout)
         else:
             action = random.choice(liste_action_possible)

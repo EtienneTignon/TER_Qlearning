@@ -1,0 +1,4 @@
+[gamma = 1, lr = 0.005]
+Lr	Win	Draw	Lose	Elimination
+1.00E+0	43	12	45	0
+5.00E-1	44	14	42	151
