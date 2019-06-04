@@ -197,13 +197,13 @@ class DeepQLearning:
             else:
                 lst_valeur = [-100.0] * (self.xout * self.yout)
                 for action_possible in liste_action_possible:
-                    act = action_possible[1]*self.xout+action_possible[0]
+                    act = action_possible[0]*self.xout+action_possible[1]
                     lst_valeur[act]=self.values[0][act]
                 self.action = lst_valeur.index(max(lst_valeur))
             action = (self.action//self.xout, self.action%self.xout)
         else:
             action = random.choice(liste_action_possible)
-            self.action = action[1]*self.xout+action[0]
+            self.action = action[0]*self.xout+action[1]
 
         #Si le moment est venu, on met à jours le réseau secondaire
         self.step += 1

@@ -39,12 +39,13 @@ def paquetpartie(nbr_batch_max=100, nbr_partie_batch=100, gamma=0.5, learningRat
             jeuEnCours = True
             disqualification = False
             while(jeuEnCours):
-                sleep(0.01)
+                #sleep(0.01)
                 if(game.actual_player==1):
                     action = joueur_dq.faireUnChoix(game.game,game.get_move(),tauxHasard=tauxHasard,action_legal_seulement=True)
                     if(action not in game.get_move()):
                         jeuEnCours = False
                         disqualification = True
+                        print("Disqualification")
                     else:
                         game.do_move(action)
                 else:
