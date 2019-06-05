@@ -13,6 +13,7 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
+from tqdm import tqdm
 
 Transition = namedtuple('Transition',
                         ('state', 'action', 'next_state', 'reward'))
@@ -51,10 +52,15 @@ class Net(nn.Module):
 
     def __init__(self, xin, yin, zin, xout, yout):
         super(Net, self).__init__()
+
+        # self.size_in = xin*yin
+        # self.size_out = xout*yout
+
         self.size_in = xin*yin*zin
         self.size_out = xout*yout
-        self.conv1 = nn.Conv3d(1,100,3,padding=1)
-        self.bnc1 = nn.BatchNorm3d(100)
+        # self.conv1 = nn.Conv3d(1,100,3,padding=1)
+        # self.bnc1 = nn.BatchNorm3d(100)
+
         """
         self.conv2 = nn.Conv3d(100,100,3,padding=1)
         self.bnc2 = nn.BatchNorm3d(100)
@@ -67,17 +73,19 @@ class Net(nn.Module):
         self.conv6 = nn.Conv3d(100,100,3,padding=1)
         self.bnc6 = nn.BatchNorm3d(100)
         """
-        self.lin1 = nn.Linear(100*self.size_in, 100*self.size_in)
+
+
+        self.lin1 = nn.Linear(self.size_in, 100*self.size_in)
         self.bnl1 = nn.BatchNorm1d(100*self.size_in)
         self.lin2 = nn.Linear(100*self.size_in, 100*self.size_out)
         self.bnl2 = nn.BatchNorm1d(100*self.size_out)
         self.lin3 = nn.Linear(100*self.size_out, self.size_out)
-        self.bnl3 = nn.BatchNorm1d(self.size_out)
+        # self.bnl3 = nn.BatchNorm1d(self.size_out)
 
 
     def forward(self, x, ):
-        x = x.unsqueeze(0).unsqueeze(0)
-        x = F.relu(self.bnc1(self.conv1(x)))
+        # x = x.unsqueeze(0).unsqueeze(0)
+        # x = F.relu(self.bnc1(self.conv1(x)))
         """
         x = F.relu(self.bnc2(self.conv2(x)))
         x = F.relu(self.bnc3(self.conv3(x)))
@@ -85,10 +93,14 @@ class Net(nn.Module):
         x = F.relu(self.bnc5(self.conv5(x)))
         x = F.relu(self.bnc6(self.conv6(x)))
         """
-        x = x.view(-1,100*9)
+        # x = x.view(-1,100*9)
+
+        x = x.view(-1,self.size_in)
         x = F.relu(self.bnl1(self.lin1(x)))
         x = F.relu(self.bnl2(self.lin2(x)))
-        x = self.bnl3(self.lin3(x))
+        x = self.lin3(x)
+
+
         #print(x)
         return x
 
@@ -117,8 +129,8 @@ class DeepQLearning:
         self.MaJrate = majrate
         self.step = 0
         #Création de la mémoire
-        self.memory = ReplayMemory(10000)
-        self.batch_size = 5000
+        self.memory = ReplayMemory(100000)
+        self.batch_size = 128
         #Initialisation des variables du Q-Learning
         self.Gamma = gamma
         self.values = False
@@ -128,6 +140,8 @@ class DeepQLearning:
         self.device = device
         self.xout = xout
         self.yout = yout
+
+        self.nb_batch = 1
 
     def nouvellePartie(self):
         """Fonction à appeler pour prévenir l'agent que la prochaine action à prendre sera la première d'une nouvelle partie.
@@ -142,28 +156,34 @@ class DeepQLearning:
         #Si la mémoire n'est pas pleine, on attend son remplissage avant de mettre à jour le réseau.
         if len(self.memory) < self.batch_size:
             return
-        #On extrait les données du batch
-        transitions = self.memory.sample(self.batch_size)
-        batch = Transition(*zip(*transitions))
-        state_batch = torch.cat(batch.state)
-        action_batch = torch.cat(batch.action)
-        reward_batch = torch.cat(batch.reward)
-        #Pour les états déarrivé, il faut distinguer les états terminaux des autres
-        non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=self.device, dtype=torch.uint8)
-        non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
-        #On calcul les valeurs attendus
-        state_action_values = self.policy_net(state_batch).gather(1, action_batch.view(-1,1))
-        next_state_values = torch.zeros(self.batch_size, device=self.device)
-        next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
-        expected_state_action_values = (next_state_values * self.Gamma) + reward_batch
-        #On en déduit la loss
-        loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
-        #On optimise
-        self.optimizer.zero_grad()
-        loss.backward()
-        for param in self.policy_net.parameters():
-            param.grad.data.clamp_(-1, 1)
-        self.optimizer.step()
+
+        # pbar = tqdm(range(self.nb_batch))
+
+        for b in range(self.nb_batch):
+            #On extrait les données du batch
+            transitions = self.memory.sample(self.batch_size)
+            batch = Transition(*zip(*transitions))
+            state_batch = torch.cat(batch.state)
+            action_batch = torch.cat(batch.action)
+            reward_batch = torch.cat(batch.reward)
+            #Pour les états déarrivé, il faut distinguer les états terminaux des autres
+            non_final_mask = torch.tensor(tuple(map(lambda s: s is not None, batch.next_state)), device=self.device, dtype=torch.uint8)
+            non_final_next_states = torch.cat([s for s in batch.next_state if s is not None])
+            #On calcul les valeurs attendus
+            state_action_values = self.policy_net(state_batch).gather(1, action_batch.view(-1,1))
+            next_state_values = torch.zeros(self.batch_size, device=self.device)
+            next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
+            expected_state_action_values = (next_state_values * self.Gamma) + reward_batch
+            #On en déduit la loss
+            loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
+            #On optimise
+            self.optimizer.zero_grad()
+            loss.backward()
+            for param in self.policy_net.parameters():
+                param.grad.data.clamp_(-1, 1)
+            self.optimizer.step()
+
+            # pbar.set_postfix(batchloss_train=loss.item())
         
     def faireUnChoix(self,etat,liste_action_possible,tauxHasard=0.0,action_legal_seulement=False):
         """Fonction servant à faire prendre une decision à l'IA.
@@ -176,7 +196,10 @@ class DeepQLearning:
         if(not self.initial):
             #self._MaJreseau(0.0,etat)
             self.memory.push(self.state, torch.tensor([self.action],dtype=torch.long, device = self.device), state, torch.tensor([0.0],dtype=torch.float, device = self.device))
-            self._MaJreseau_Batch()
+
+
+            for i in range(self.nb_batch):
+                self._MaJreseau_Batch()
         else:
             self.initial = False
         
@@ -217,7 +240,7 @@ class DeepQLearning:
         if(not self.initial):
             state = None
             #self._MaJreseau(1.0,etat,True)
-            self.memory.push(self.state, torch.tensor([self.action],dtype=torch.long), state, torch.tensor([1.0],dtype=torch.float))
+            self.memory.push(self.state, torch.tensor([self.action],dtype=torch.long, device = self.device), state, torch.tensor([1.0],dtype=torch.float, device = self.device))
             self._MaJreseau_Batch()
         self.AncienEtat = ()
         self.AncienneValeur = ()
@@ -227,7 +250,7 @@ class DeepQLearning:
             #On restructure l'état.
             state = None
             #self._MaJreseau(-1.0,etat,True)
-            self.memory.push(self.state, torch.tensor([self.action],dtype=torch.long), state, torch.tensor([-1.0],dtype=torch.float))
+            self.memory.push(self.state, torch.tensor([self.action],dtype=torch.long, device = self.device), state, torch.tensor([-1.0],dtype=torch.float, device = self.device))
             self._MaJreseau_Batch()
         self.AncienEtat = ()
         self.AncienneValeur = ()
@@ -237,7 +260,7 @@ class DeepQLearning:
             #On restructure l'état.
             state = None
             #self._MaJreseau(0.0,etat,True)
-            self.memory.push(self.state, torch.tensor([self.action],dtype=torch.long), state, torch.tensor([0.0],dtype=torch.float))
+            self.memory.push(self.state, torch.tensor([self.action],dtype=torch.long, device = self.device), state, torch.tensor([0.0],dtype=torch.float, device = self.device))
             self._MaJreseau_Batch()
         self.AncienEtat = ()
         self.AncienneValeur = ()

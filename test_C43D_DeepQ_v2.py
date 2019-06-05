@@ -21,7 +21,7 @@ c43d_larg = 3
 c43d_haut = 1
 c43d_lign = 3
 
-def paquetpartie(nbr_batch_max=100, nbr_partie_batch=100, gamma=0.5, learningRate=0.001):
+def paquetpartie(nbr_batch_max=100, nbr_partie_batch=100, gamma=1, learningRate=0.001):
     joueur_dq = DeepQLearning(c43d_long,c43d_larg,c43d_haut,c43d_long,c43d_larg, gamma = gamma, learning_rate = learningRate)
     joueur_rand = RandomPlayer()
     nbr_partie = 1
@@ -75,7 +75,7 @@ def paquetpartie(nbr_batch_max=100, nbr_partie_batch=100, gamma=0.5, learningRat
             while(jeuEnCours):
                 #print(game.game)
                 if(game.actual_player==1):
-                    action = joueur_dq.faireUnChoix(game.game,game.get_move(),tauxHasard=tauxHasard,action_legal_seulement=True)
+                    action = joueur_dq.faireUnChoix(game.game,game.get_move(),tauxHasard=0,action_legal_seulement=True)
                     if(action not in game.get_move()):
                         joueur_dq.perdre()
                         elimination += 1
@@ -97,13 +97,13 @@ def paquetpartie(nbr_batch_max=100, nbr_partie_batch=100, gamma=0.5, learningRat
             nbr_partie += 1
         txt += "{:.2E}".format(Decimal(tauxHasard)) + "\t" + str(victoire) + "\t" + str(egualite) + "\t" + str(defaite) + "\t" + str(elimination) + "\n"
         print("{:.2E}".format(Decimal(tauxHasard)) + " " + str(victoire) + " " + str(egualite) + " " + str(defaite) + " " + str(elimination))
-        tauxHasard = tauxHasard/2.0
+        tauxHasard = tauxHasard/1.2
         nbr_batch += 1
         fichier = open("Batch_g"+str(gamma)+"_lr"+str(learningRate)+".txt", "w")
         fichier.write(txt)
         torch.save(joueur_dq.policy_net,"reso.pt")
 
-paquetpartie(nbr_batch_max=1000, gamma = 1, learningRate=0.005)
+paquetpartie(nbr_batch_max=1000, gamma = 1, learningRate=0.001)
 
 """
 gamma = 0.0
