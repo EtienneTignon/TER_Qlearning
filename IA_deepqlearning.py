@@ -113,7 +113,7 @@ class Net(nn.Module):
 
 class DeepQLearning:
     
-    def __init__(self, xin, yin, zin, xout, yout, majrate = 500, gamma=0.3, learning_rate = 0.002, device = "cpu"):
+    def __init__(self, xin, yin, zin, xout, yout, majrate = 1000, gamma=0.3, learning_rate = 0.002, device = "cpu"):
         super(DeepQLearning, self).__init__()
         #Creation des deux réseaux de neurones.
         self.policy_net = Net(xin, yin, zin, xout, yout)
@@ -129,8 +129,8 @@ class DeepQLearning:
         self.MaJrate = majrate
         self.step = 0
         #Création de la mémoire
-        self.memory = ReplayMemory(100000)
-        self.batch_size = 128
+        self.memory = ReplayMemory(1000)
+        self.batch_size = 250
         #Initialisation des variables du Q-Learning
         self.Gamma = gamma
         self.values = False
@@ -188,7 +188,7 @@ class DeepQLearning:
     def faireUnChoix(self,etat,liste_action_possible,tauxHasard=0.0,action_legal_seulement=False):
         """Fonction servant à faire prendre une decision à l'IA.
         Ses paramètres sont l'état actuel du jeu, ainsi que le pourcentage de chance de prendre une decision aléatoire (entre 0 et 1)."""
-        
+                
         #On restructure l'état.
         state = torch.tensor(etat,dtype=torch.float,device = self.device)
         
@@ -220,13 +220,13 @@ class DeepQLearning:
             else:
                 lst_valeur = [-100.0] * (self.xout * self.yout)
                 for action_possible in liste_action_possible:
-                    act = action_possible[0]*self.xout+action_possible[1]
+                    act = action_possible[1]*self.xout+action_possible[0]
                     lst_valeur[act]=self.values[0][act]
                 self.action = lst_valeur.index(max(lst_valeur))
-            action = (self.action//self.xout, self.action%self.xout)
+            action = (self.action%self.xout, self.action//self.xout)
         else:
             action = random.choice(liste_action_possible)
-            self.action = action[0]*self.xout+action[1]
+            self.action = action[1]*self.xout+action[0]
 
         #Si le moment est venu, on met à jours le réseau secondaire
         self.step += 1

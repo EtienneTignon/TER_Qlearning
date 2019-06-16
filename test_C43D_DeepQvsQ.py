@@ -7,7 +7,7 @@ Created on Thu Apr 18 18:34:35 2019
 """
 
 from IA_deepqlearning import DeepQLearning
-from IA_random import RandomPlayer
+from IA_qlearning_v2 import QLearning
 from Connect43D import Connect43D
 
 from random import random
@@ -24,7 +24,7 @@ c43d_lign = 3
 
 def paquetpartie(nbr_batch_max=100, nbr_partie_batch=100, gamma=1, learningRate=0.001):
     joueur_dq = DeepQLearning(c43d_long,c43d_larg,c43d_haut,c43d_long,c43d_larg, gamma = gamma, learning_rate = learningRate)
-    joueur_rand = RandomPlayer()
+    joueur_q = QLearning()
     nbr_partie = 1
     nbr_batch = 1
     tauxHasard = 1.0
@@ -52,7 +52,7 @@ def paquetpartie(nbr_batch_max=100, nbr_partie_batch=100, gamma=1, learningRate=
                     else:
                         game.do_move(action)
                 else:
-                    game.do_move(joueur_rand.smartRandom(game.get_move()))
+                    game.do_move(joueur_q.prendreUneDecision(game.game,game.get_move(),tauxHasard))
                 if (game.is_finished()):
                         jeuEnCours = False
             if(disqualification or game.winner==2):
@@ -72,7 +72,7 @@ def paquetpartie(nbr_batch_max=100, nbr_partie_batch=100, gamma=1, learningRate=
         pbar = tqdm(range(100))
         for i in pbar: 
             game = Connect43D(c43d_haut,c43d_larg,c43d_long,c43d_lign)
-            if(random() < 0.5):
+            if(i%2==1):
                 game.actual_player=2
             joueur_dq.nouvellePartie()
             jeuEnCours = True
@@ -86,17 +86,20 @@ def paquetpartie(nbr_batch_max=100, nbr_partie_batch=100, gamma=1, learningRate=
                     else:
                         game.do_move(action)
                 else:
-                    game.do_move(joueur_rand.smartRandom(game.get_move()))
+                    game.do_move(joueur_q.prendreUneDecision(game.game,game.get_move(),0.0))
                 if (game.is_finished()):
                         jeuEnCours = False
             if(game.winner==2):
                 joueur_dq.perdre()
+                joueur_q.gagne()
                 defaite += 1
             elif(game.winner==1):
                 joueur_dq.gagner()
+                joueur_q.perdu()
                 victoire += 1
             else:
                 joueur_dq.egaliser()
+                joueur_q.egalite()
                 egualite += 1
             nbr_partie += 1
         txt += "{:.2E}".format(Decimal(tauxHasard)) + "\t" + str(victoire) + "\t" + str(egualite) + "\t" + str(defaite) + "\t" + str(elimination) + "\n"

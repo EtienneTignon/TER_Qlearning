@@ -13,8 +13,41 @@ from IA_random import RandomPlayer
 def partieEntreQ(joueur1, joueur2):
     i = 0
     gagne = 0.0
+    egualise = 0.0
+    perd = 0.0
     while i < 100:
-        game = Connect43D()
+        game = Connect43D(1,3,3,3)
+        while True:  
+            #if i==99: print(game.game)
+            if (game.is_finished()):
+                break
+            game.do_move(joueur1.prendreUneDecision(game.game,game.get_move(),0.0))
+            #if i==99: print(game.game)
+            if (game.is_finished()):
+                break
+            game.do_move(joueur2.prendreUneDecision(game.game,game.get_move(),0.0))
+        if(game.winner == 1):
+            joueur1.gagne()
+            joueur2.perdu()
+            gagne += 1.0
+        elif(game.winner == 2):
+            joueur1.perdu()
+            joueur2.gagne()
+            perd += 1.0
+        else:
+            joueur1.egalite()
+            joueur2.egalite()
+            egualise += 1.0
+        i += 1
+    ratioj1 = gagne/100.0
+    rationul = egualise/100.0
+    ratioj2 = perd/100.0
+    return ratioj1,rationul,ratioj2
+
+def EntrainementEntreQ(joueur1, joueur2):
+    i = 0
+    while i < 1:
+        game = Connect43D(1,3,3,3)
         while True:    
             if (game.is_finished()):
                 break
@@ -25,17 +58,13 @@ def partieEntreQ(joueur1, joueur2):
         if(game.winner == 1):
             joueur1.gagne()
             joueur2.perdu()
-            gagne += 1.0
         elif(game.winner == 2):
             joueur1.perdu()
             joueur2.gagne()
         else:
-            joueur1.gagne()
-            joueur2.gagne()
+            joueur1.egalite()
+            joueur2.egalite()
         i += 1
-    ratioj1 = gagne/100.0
-    ratioj2 = 1.0-ratioj1
-    return ratioj1,ratioj2
 
 def partieContreRand(joueur, premier): 
     joueurRand = RandomPlayer()
@@ -247,9 +276,10 @@ while(alpha<=1):
 """
 
 joueurQ = QLearning()
+joueurQ2 = QLearning()
 i = 0
 while(i<1000):
-    entrainementContreRand(joueurQ,True)
-    print("J1 : " + str(partieContreRand(joueurQ,True)))
+    EntrainementEntreQ(joueurQ,joueurQ2)
+    print(partieEntreQ(joueurQ,joueurQ2))
     # joueurQ.enrengistrerMatriceTransition("test.txt")
     i += 1
