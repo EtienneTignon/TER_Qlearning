@@ -26,3 +26,17 @@ class RandomPlayer:
         """Prend une decision parmis celles possibles"""
         return choice(listeActionPossible)
     
+    def nouvellePartie(self):
+        pass
+
+    def perdre(self):
+        pass
+
+    def gagner(self):
+        pass
+
+    def egaliser(self):
+        pass
+
+    def faireUnChoix(self,etat,liste_action_possible,tauxHasard=0.0,action_legal_seulement=False):
+        return self.smartRandom(liste_action_possible)

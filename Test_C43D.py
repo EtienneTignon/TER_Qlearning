@@ -9,6 +9,7 @@ Created on Fri Jun 14 00:33:43 2019
 from Connect43D import Connect43D
 from IA_deepqlearning import DeepQLearning
 from IA_qlearning_v2 import QLearning
+from IA_random import RandomPlayer
 from tqdm import tqdm
 from decimal import Decimal
 
@@ -70,12 +71,12 @@ def paquetsParties(joueur1, joueur2, nbr_batch=100, nbr_partie_batch=100, c43d_h
         fichier.write(txt)
   
 
-c43d_long = 3
-c43d_larg = 3
-c43d_haut = 1
-c43d_lign = 3    
+c43d_long = 4
+c43d_larg = 4
+c43d_haut = 4
+c43d_lign = 4    
 #j1 = DeepQLearning(c43d_long,c43d_larg,c43d_haut,c43d_long,c43d_larg, gamma = 1, learning_rate = 0.001)
 #j2 = DeepQLearning(c43d_long,c43d_larg,c43d_haut,c43d_long,c43d_larg, gamma = 1, learning_rate = 0.001)
-j1=DeepQLearning(c43d_long,c43d_larg,c43d_haut,c43d_long,c43d_larg, gamma = 1, learning_rate = 0.001)
+j1=RandomPlayer()
 j2=QLearning()
 paquetsParties(j1, j2, nbr_batch=1000, nbr_partie_batch=1000, c43d_haut=c43d_haut, c43d_larg=c43d_larg, c43d_long=c43d_long, c43d_lign=c43d_lign)

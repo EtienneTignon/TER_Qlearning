@@ -1,24 +1,16 @@
 # TER Q learning
 
-Ce dépot contient une implémentation du puissance 4 en 3d et du morpion, ainsi que plusieurs algorithmes de Q-Learning et de MCTS.
+Ce dépot contient une implémentation du puissance 4 en 3d, ainsi que plusieurs algorithmes de Q-Learning.
 
 ## Jeux implémentés
- - Connect43D.py : Ce fichier contient une implémentation du puissance 4 3D sur une grille 4x4x4.
- - Morpion.py : Une implémentation du morpion.
+ - Connect43D.py : Ce fichier contient une implémentation du puissance 4 3D sur une grille 4x4x4. Il est néanmoins possible de paramétrer la taille de la grille et le nombre de pièces à aligner afin de travailler sur des variantes (comme le tic tac toe, le puissance 4 ...)
 
 ## IAs implémentées
- - IA\_mcts.py : le Monté-Carlo Tree Search
- - IA\_qlearning\_v1.py : Une implémentation du Q-Learning dédié au puissance 4 en 3D.
- - IA\_qlearning\_v2.py : Une implémentation du Q-Learning prenant des matrices en entrées.
- - IA\_qlearning\_v3.py : Une implémentation du Q-Learning prenant des tuples en entrées.
  - IA\_random.py : Une IA complétement aléatoire.
- - IA\_deepqlearning.py : Une implementation du deep Q learning (!!!WIP!!!)
+ - IA\_qlearning.py : Une implémentation du Q-Learning généraliste.
+ - IA\_qlearning\_c43d.py : Une implémentation du Q-Learning dédié au puissance 4 en 3D. Elle utilise une fonction de réduction pour limiter le nombre d'états. Elle est néanmoins peu efficace.
+ - IA\_deepqlearning.py : Une implementation du deep Q learning composé uniquement de couches linéaires
+ - IA\_deepqlearning\_conv.py : Une implementation du deep Q learning avec une couche de convolution supplémentaire
 
 ## Fichiers de test
- - test\_C43D\_Q.py
- - test\_C43D\_QvsMCTS.py
- - test\_C43D\_random.py
- - test\_morpion\_Q.py
-
-## Deep Learning
- - DeepQTest.py : Contient un morpion et un agent de deep Q learning adapté pour le résoudre.
+ - Test\_C43D.py : Ce fichier test est paramétrable. Il est possible de choisir quels agents serons en copetition, sur quel jeu et avec quel hyper-paramètres.
